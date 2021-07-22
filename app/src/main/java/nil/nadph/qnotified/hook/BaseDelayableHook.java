@@ -20,6 +20,7 @@ package nil.nadph.qnotified.hook;
 
 import me.kyuubiran.hook.*;
 import me.kyuubiran.hook.testhook.*;
+import me.nextalone.hook.EnableQLog;
 import me.singleneuron.hook.*;
 import me.singleneuron.hook.decorator.SimpleCheckIn;
 import nil.nadph.qnotified.SyncUtils;
@@ -109,7 +110,8 @@ public abstract class BaseDelayableHook implements SwitchConfigItem {
                 RevokeMsg.INSTANCE,
                 ItemBuilderFactoryHook.INSTANCE,
                 SimpleCheckIn.INSTANCE,
-                StartActivityHook.INSTANCE
+                StartActivityHook.INSTANCE,
+                EnableQLog.INSTANCE
         };
         return sAllHooks;
     }

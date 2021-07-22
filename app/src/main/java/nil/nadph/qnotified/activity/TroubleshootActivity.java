@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
+import me.nextalone.hook.EnableQLog;
 import me.singleneuron.activity.BugReportActivity;
 import me.singleneuron.data.CardMsgCheckResult;
 import me.singleneuron.hook.DebugDump;
@@ -72,7 +73,7 @@ public class TroubleshootActivity extends IphoneTitleBarActivityCompat {
     @Override
     public boolean doOnCreate(Bundle savedInstanceState) {
         super.doOnCreate(savedInstanceState);
-        final LinearLayout ll = new LinearLayout(this);
+        LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
         ViewGroup.LayoutParams mmlp = new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT);
         LinearLayout __ll = new LinearLayout(this);
@@ -108,6 +109,7 @@ public class TroubleshootActivity extends IphoneTitleBarActivityCompat {
         ll.addView(subtitle(this, "以下内容基本上都没用，它们为了修复故障才留在这里。"));
         ll.addView(subtitle(this, "测试"));
         ll.addView(newListItemHookSwitchInit(this, "堆栈转储", "没事别开", DebugDump.INSTANCE));
+        ll.addView(newListItemHookSwitchInit(this, "开启QQ日志", "前缀NAdump", EnableQLog.INSTANCE));
         ll.addView(newListItemButton(this, "强制重新生成日志历史记录", null, null, new View.OnClickListener() {
             final String LAST_TRACE_HASHCODE_CONFIG = "lastTraceHashcode";
             final String LAST_TRACE_DATA_CONFIG = "lastTraceDate";
@@ -279,7 +281,7 @@ public class TroubleshootActivity extends IphoneTitleBarActivityCompat {
         }
 
         ll.addView(subtitle(this, "SystemClassLoader\n" + ClassLoader.getSystemClassLoader()
-                + "\nContext.getClassLoader()\n" + this.getClassLoader()
+                + "\nContext.getClassLoader()\n" + getClassLoader()
                 + "\nThread.getContextClassLoader()\n" + Thread.currentThread().getContextClassLoader()
                 + "\nInitiator.getHostClassLoader()\n" + Initiator.getHostClassLoader()));
         long ts = Utils.getBuildTimestamp();
@@ -295,7 +297,7 @@ public class TroubleshootActivity extends IphoneTitleBarActivityCompat {
         }
         ll.addView(subtitle(this, info));
         __ll.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
-        this.setContentView(bounceScrollView);
+        setContentView(bounceScrollView);
         LinearLayout.LayoutParams _lp_fat = new LinearLayout.LayoutParams(MATCH_PARENT, 0);
         _lp_fat.weight = 1;
         setTitle("故障排除");
@@ -306,8 +308,8 @@ public class TroubleshootActivity extends IphoneTitleBarActivityCompat {
     public View.OnClickListener clickToRefreshUserStatus() {
         return new View.OnClickListener() {
             @Override
-            public void onClick(final View view) {
-                final long uin = Utils.getLongAccountUin();
+            public void onClick( View view) {
+                long uin = Utils.getLongAccountUin();
                 if (uin < 10000) return;
                 new Thread(new Runnable() {
                     @Override
@@ -334,8 +336,8 @@ public class TroubleshootActivity extends IphoneTitleBarActivityCompat {
                             msg = e.toString();
                             t = e;
                         }
-                        final Throwable finalT = t;
-                        final String finalMsg = msg;
+                        Throwable finalT = t;
+                        String finalMsg = msg;
                         view.post(new Runnable() {
                             @Override
                             public void run() {
