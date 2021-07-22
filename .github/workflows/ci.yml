@@ -36,10 +36,21 @@ jobs:
       run: |
         if ${{ !!github.head_ref }}; then echo "::warning:: Gradle $WARN_ON_PR"; fi
         ./gradlew build
-    
-    - name: Upload articact
+
+    - name: Get short SHA
+      id: sha7
+      run: echo "::set-output name=sha::$(echo ${GITHUB_SHA} | cut -c1-7)"
+
+    - name: Upload release
       uses: actions/upload-artifact@v2
       if: ${{ !github.head_ref }}
       with:
-        path: app/build/outputs/apk
-        name: gradle
+        path: app/build/outputs/apk/release
+        name: gradle-release-${{ steps.sha7.outputs.sha }}
+
+    - name: Upload debug
+      uses: actions/upload-artifact@v2
+      if: ${{ !github.head_ref }}
+      with:
+        path: app/build/outputs/apk/debug
+        name: gradle-debug-${{ steps.sha7.outputs.sha }}
