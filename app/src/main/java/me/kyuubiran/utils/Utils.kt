@@ -5,8 +5,9 @@ import android.os.Looper
 import android.view.View
 import android.widget.Toast
 import nil.nadph.qnotified.util.Initiator
-import nil.nadph.qnotified.util.Nullable
 import nil.nadph.qnotified.util.Utils
+import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 
 fun Context.showToastBySystem(text: CharSequence, duration: Int = Toast.LENGTH_SHORT) {
     if (Looper.getMainLooper() == Looper.myLooper())
@@ -20,39 +21,66 @@ fun Context.showToastByTencent(text: CharSequence, type: Int = Utils.TOAST_TYPE_
     else Utils.runOnUiThread { showToastByTencent(text, duration) }
 }
 
-fun setZeroHeightWeight(v: View) {
-    v.layoutParams.width = 0
-    v.layoutParams.height = 0
-}
-
-fun logd(msg: String) {
-    Utils.logd("好耶 $msg")
-}
-
-fun logd(i: Int, msg: String? = "") {
-    when (i) {
-        0 -> logd("找到类了 $msg")
-        1 -> logd("找到方法了 $msg")
-        2 -> logd("开始Hook了 $msg")
-        3 -> logd("开始搞事情了 $msg")
-        4 -> logd("搞完事情了 $msg")
-        5 -> logd("搞出大事情了 \n$msg")
-    }
+fun View.setViewZeroSize() {
+    this.layoutParams.height = 0
+    this.layoutParams.width = 0
 }
 
 fun log(t: Throwable) {
     Utils.log(t)
 }
 
-@Nullable
-fun getObjectOrNull(obj: Any?, str: String, clz: Class<*>? = null): Any? {
-    return Utils.iget_object_or_null(obj, str, clz)
+fun getObjectOrNull(obj: Any?, objName: String, clz: Class<*>? = null): Any? {
+    return Utils.iget_object_or_null(obj, objName, clz)
 }
 
-fun putObject(obj: Any?, name: String, value: Any, type: Class<*>? = null) {
+fun putObject(obj: Any?, name: String, value: Any?, type: Class<*>? = null) {
     Utils.iput_object(obj, name, type, value)
 }
 
 fun loadClass(clzName: String): Class<*> {
     return Initiator.load(clzName)
+}
+
+fun getMethods(clzName: String): Array<Method> {
+    return Initiator.load(clzName).declaredMethods
+}
+
+fun getMethods(clz: Class<Any>): Array<Method> {
+    return clz.declaredMethods
+}
+
+//fun Method.isStatic(): Boolean {
+//    return Modifier.isStatic(this.modifiers)
+//}
+
+val Method.isStatic: Boolean
+    get() = Modifier.isStatic(this.modifiers)
+
+//fun Method.isPrivate(): Boolean {
+//    return Modifier.isPrivate(this.modifiers)
+//}
+
+val Method.isPrivate: Boolean
+    get() = Modifier.isPrivate(this.modifiers)
+
+//fun Method.isPublic(): Boolean {
+//    return Modifier.isPublic(this.modifiers)
+//}
+
+val Method.isPublic: Boolean
+    get() = Modifier.isPublic(this.modifiers)
+
+
+fun makeSpaceMsg(str: String): String {
+    val sb = StringBuilder()
+    if (str.length > 1) {
+        for (i in str.indices) {
+            sb.append(str[i])
+            if (i != str.length - 1) sb.append(" ")
+        }
+    } else {
+        sb.append(str)
+    }
+    return sb.toString()
 }

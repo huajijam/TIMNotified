@@ -1,6 +1,6 @@
 /* QNotified - An Xposed module for QQ/TIM
  * Copyright (C) 2019-2020 xenonhydride@gmail.com
- * https://github.com/cinit/QNotified
+ * https://github.com/ferredoxin/QNotified
  *
  * This software is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,12 +28,7 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
 import androidx.core.view.ViewCompat;
 
@@ -42,6 +37,7 @@ import com.tencent.mobileqq.widget.BounceScrollView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import me.kyuubiran.utils.UtilsKt;
 import nil.nadph.qnotified.ExfriendManager;
 import nil.nadph.qnotified.R;
 import nil.nadph.qnotified.config.ConfigItems;
@@ -56,19 +52,10 @@ import nil.nadph.qnotified.util.Utils;
 import static android.text.InputType.TYPE_CLASS_TEXT;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-import static nil.nadph.qnotified.ui.ViewBuilder.R_ID_VALUE;
-import static nil.nadph.qnotified.ui.ViewBuilder.clickToProxyActAction;
-import static nil.nadph.qnotified.ui.ViewBuilder.newLinearLayoutParams;
-import static nil.nadph.qnotified.ui.ViewBuilder.newListItemButton;
-import static nil.nadph.qnotified.ui.ViewBuilder.newListItemSwitchFriendConfigNext;
-import static nil.nadph.qnotified.ui.ViewBuilder.subtitle;
+import static nil.nadph.qnotified.ui.ViewBuilder.*;
 import static nil.nadph.qnotified.util.ActProxyMgr.ACTION_CHAT_TAIL_FRIENDS_ACTIVITY;
 import static nil.nadph.qnotified.util.ActProxyMgr.ACTION_CHAT_TAIL_TROOPS_ACTIVITY;
-import static nil.nadph.qnotified.util.Utils.TOAST_TYPE_ERROR;
-import static nil.nadph.qnotified.util.Utils.dip2px;
-import static nil.nadph.qnotified.util.Utils.dip2sp;
-import static nil.nadph.qnotified.util.Utils.log;
-import static nil.nadph.qnotified.util.Utils.logi;
+import static nil.nadph.qnotified.util.Utils.*;
 
 @SuppressLint("Registered")
 public class ChatTailActivity extends IphoneTitleBarActivityCompat implements View.OnClickListener {
@@ -151,14 +138,15 @@ public class ChatTailActivity extends IphoneTitleBarActivityCompat implements Vi
         __tv_chat_tail_time_format = _s.findViewById(R_ID_VALUE);
         ll.addView(subtitle(ChatTailActivity.this, "设置小尾巴"));
         ll.addView(subtitle(ChatTailActivity.this, "可用变量(点击自动输入): "));
-        LinearLayout _a, _b, _c, _d, _e, _f, _g;
+        LinearLayout _a, _b, _c, _d, _e, _f, _g, _h;
         ll.addView(_a = subtitle(ChatTailActivity.this, delimiter + "         : 当前消息"));
         ll.addView(_b = subtitle(ChatTailActivity.this, "#model#   : 手机型号"));
         ll.addView(_c = subtitle(ChatTailActivity.this, "#brand#   : 手机厂商"));
         ll.addView(_d = subtitle(ChatTailActivity.this, "#battery# : 当前电量"));
         ll.addView(_e = subtitle(ChatTailActivity.this, "#power#   : 是否正在充电"));
         ll.addView(_f = subtitle(ChatTailActivity.this, "#time#    : 当前时间"));
-        ll.addView(_g = subtitle(ChatTailActivity.this, "\\n       : 换行"));
+        ll.addView(_g = subtitle(ChatTailActivity.this, "#Spacemsg#    : 空格消息"));
+        ll.addView(_h = subtitle(ChatTailActivity.this, "\\n       : 换行"));
         int _5dp = dip2px(ChatTailActivity.this, 5);
         EditText pct = createEditText(R_ID_PERCENT_VALUE, _5dp,
                 ct.getTailCapacity().replace("\n", "\\n"),
@@ -169,7 +157,8 @@ public class ChatTailActivity extends IphoneTitleBarActivityCompat implements Vi
         _d.setOnClickListener(v -> pct.setText(pct.getText() + "#battery#"));
         _e.setOnClickListener(v -> pct.setText(pct.getText() + "#power#"));
         _f.setOnClickListener(v -> pct.setText(pct.getText() + "#time#"));
-        _g.setOnClickListener(v -> pct.setText(pct.getText() + "\\n"));
+        _g.setOnClickListener(v -> pct.setText(pct.getText() + "#Spacemsg#"));
+        _h.setOnClickListener(v -> pct.setText(pct.getText() + "\\n"));
         ll.addView(pct, newLinearLayoutParams(MATCH_PARENT, WRAP_CONTENT, 2 * _5dp, _5dp, 2 * _5dp, _5dp));
         ll.addView(newListItemSwitchFriendConfigNext(this, "正则开关",
                 "通过正则表达式的消息不会携带小尾巴(无需重启" + Utils.getHostAppName() + ")",
@@ -205,11 +194,11 @@ public class ChatTailActivity extends IphoneTitleBarActivityCompat implements Vi
         pct.setTextColor(ResUtils.skin_black);
         pct.setTextSize(dip2sp(ChatTailActivity.this, 18));
         //pct.setBackgroundDrawable(null);
-        ViewCompat.setBackground(pct,null);
+        ViewCompat.setBackground(pct, null);
         pct.setGravity(Gravity.CENTER);
         pct.setPadding(_5dp, _5dp / 2, _5dp, _5dp / 2);
         //pct.setBackgroundDrawable(new HighContrastBorder());
-        ViewCompat.setBackground(pct,new HighContrastBorder());
+        ViewCompat.setBackground(pct, new HighContrastBorder());
         pct.setHint(hint);
         pct.setText(text);
         pct.setSelection(pct.getText().length());
@@ -259,7 +248,7 @@ public class ChatTailActivity extends IphoneTitleBarActivityCompat implements Vi
         boolean enabled = ct.isEnabled();
         String desc = "当前状态: ";
         if (enabled) {
-            if (!ct.isRegex() || !ct.isPassRegex("示例消息"))
+            if (!ct.isRegex() || !ct.isPassRegex("示例消息")) {
                 desc += "已开启: \n" + ct.getTailCapacity()
                         .replace(ChatTailActivity.delimiter, "示例消息")
                         .replace("#model#", Build.MODEL)
@@ -267,8 +256,13 @@ public class ChatTailActivity extends IphoneTitleBarActivityCompat implements Vi
                         .replace("#battery#", battery + "")
                         .replace("#power#", ChatTailActivity.getPower())
                         .replace("#time#", new SimpleDateFormat(RikkaCustomMsgTimeFormatDialog.getTimeFormat()).format(new Date()));
-            else
+                if (desc.contains("#Spacemsg#")) {
+                    desc = desc.replace("#Spacemsg#", "");
+                    desc = UtilsKt.makeSpaceMsg(desc);
+                }
+            } else {
                 desc += "已开启: \n示例消息";
+            }
         } else {
             desc += "禁用";
         }
@@ -303,7 +297,6 @@ public class ChatTailActivity extends IphoneTitleBarActivityCompat implements Vi
                             .setMessage("等待 :MSF 进程响应").show();
                     SyncUtils.enumerateProc(this, SyncUtils.PROC_MSF, 3000, new SyncUtils.EnumCallback() {
                         private boolean mFinished = false;
-
                         @Override
                         public void onResponse(SyncUtils.EnumRequestHolder holder, SyncUtils.ProcessInfo process) {
                             if (mFinished) return;
@@ -312,7 +305,6 @@ public class ChatTailActivity extends IphoneTitleBarActivityCompat implements Vi
                             waitDialog.dismiss();
                             doUpdateTailCfg();
                         }
-
                         @Override
                         public void onEnumResult(SyncUtils.EnumRequestHolder holder) {
                             if (mFinished) return;
@@ -331,7 +323,6 @@ public class ChatTailActivity extends IphoneTitleBarActivityCompat implements Vi
                         }
                     });
                 }
-
                 */
                 break;
             case R_ID_DISABLE:

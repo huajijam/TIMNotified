@@ -1,6 +1,6 @@
 /* QNotified - An Xposed module for QQ/TIM
  * Copyright (C) 2019-2020 xenonhydride@gmail.com
- * https://github.com/cinit/QNotified
+ * https://github.com/ferredoxin/QNotified
  *
  * This software is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,13 +19,23 @@
 package nil.nadph.qnotified.hook;
 
 import android.content.Context;
-import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Looper;
 import android.os.Parcelable;
 import android.widget.Toast;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
+import me.kyuubiran.utils.UtilsKt;
 import nil.nadph.qnotified.ExfriendManager;
 import nil.nadph.qnotified.SyncUtils;
 import nil.nadph.qnotified.activity.ChatTailActivity;
@@ -37,19 +47,6 @@ import nil.nadph.qnotified.util.DexKit;
 import nil.nadph.qnotified.util.LicenseStatus;
 import nil.nadph.qnotified.util.Utils;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-import static android.content.Context.ACTIVITY_SERVICE;
-import static android.content.Context.BATTERY_SERVICE;
-import static androidx.core.content.ContextCompat.getSystemService;
 import static nil.nadph.qnotified.util.Initiator._SessionInfo;
 import static nil.nadph.qnotified.util.Utils.*;
 
@@ -103,16 +100,20 @@ public class ChatTailHook extends BaseDelayableHook {
                             // m.invoke(null, qqAppInterface, context, sessionInfo, msg, new ArrayList<>(), SendMsgParams.newInstance());
                             // final Parcelable session = getFirstNSFByType(param.thisObject, _SessionInfo());
                             // String text = input.getText().toString();
-                            Field field = null;
-                            for (Field f : session.getClass().getDeclaredFields()) {
-                                // 因为有多个同名变量，所以要判断返回类型
-                                if (f.getName().equalsIgnoreCase("a") && f.getType() == String.class) {
-                                    field = f;
-                                    //debug.append("变量反射成功！！！").append("\n");
+                            String uin = "10000";
+                            if (!isGlobal()) {
+                                Field field = null;
+                                for (Field f : session.getClass().getDeclaredFields()) {
+                                    // 因为有多个同名变量，所以要判断返回类型
+                                    if (f.getName().equalsIgnoreCase("a") && f.getType() == String.class) {
+                                        field = f;
+                                        //debug.append("变量反射成功！！！").append("\n");
+                                    }
                                 }
+                                if (null == field) field = session.getClass().getDeclaredField("curFriendUin");
+                                uin = (String) field.get(session);
+                                //String uin = "123321";
                             }
-                            String uin = (String) field.get(session);
-                            //String uin = "123321";
                             ChatTailHook ct = ChatTailHook.get();
                             // debug.append("当前小尾巴: ").append(ct.getTailCapacity().replace("\n", "\\n")).append("\n");
                             // debug.append("当前uin: ").append(uin).append("\n");
@@ -122,15 +123,19 @@ public class ChatTailHook extends BaseDelayableHook {
                             logi("getTailRegex:" + ChatTailHook.getTailRegex());
                             // debug.append("群列表: ").append(muted).append("\n");
                             if ((ct.isGlobal() || ct.containsTroop(uin) || ct.containsFriend(uin))
-                                && isRegex() && !isPassRegex(msg)) {
+                                    && (!isRegex() || !isPassRegex(msg))) {
                                 int battery = FakeBatteryHook.get().isEnabled() ? FakeBatteryHook.get().getFakeBatteryStatus() < 1 ? ChatTailActivity.getBattery() : FakeBatteryHook.get().getFakeBatteryCapacity() : ChatTailActivity.getBattery();
-                                text = ct.getTailCapacity().
-                                        replace(ChatTailActivity.delimiter, msg)
+                                text = ct.getTailCapacity()
+                                        .replace(ChatTailActivity.delimiter, msg)
                                         .replace("#model#", Build.MODEL)
                                         .replace("#brand#", Build.BRAND)
                                         .replace("#battery#", battery + "")
                                         .replace("#power#", ChatTailActivity.getPower())
                                         .replace("#time#", new SimpleDateFormat(RikkaCustomMsgTimeFormatDialog.getTimeFormat()).format(new Date()));
+                                if (ct.getTailCapacity().contains("#Spacemsg#")) {
+                                    text = text.replace("#Spacemsg#", "");
+                                    text = UtilsKt.makeSpaceMsg(text);
+                                }
                             }
                         } catch (Throwable e) {
                             log(e);
@@ -167,7 +172,6 @@ public class ChatTailHook extends BaseDelayableHook {
                                     StringBuilder debug = new StringBuilder();
                                     String text = input.getText().toString();
                                     ConfigManager cfg = ExfriendManager.getCurrent().getConfig();
-
                                     Field field = null;
                                     for (Field f : session.getClass().getDeclaredFields()) {
                                         if (f.getName().equalsIgnoreCase("a") && f.getType() == String.class) {
@@ -201,7 +205,6 @@ public class ChatTailHook extends BaseDelayableHook {
                     }
                 }
             });
-
              */
             //End: send btn
             inited = true;
@@ -228,13 +231,14 @@ public class ChatTailHook extends BaseDelayableHook {
 
     /**
      * 通过正则表达式的消息不会携带小尾巴（主要是考虑到用户可能写错表达式）
+     *
      * @param msg 原始聊天消息文本
      * @return 该消息是否通过指定的正则表达式
-     * */
+     */
     public static boolean isPassRegex(String msg) {
         try {
             return Pattern.compile(getTailRegex()).matcher(msg).find();
-        }catch (PatternSyntaxException e) {
+        } catch (PatternSyntaxException e) {
             XposedBridge.log(e);
             return false;
         }
@@ -264,7 +268,7 @@ public class ChatTailHook extends BaseDelayableHook {
         return getTailStatus().replace("\\n", "\n");
     }
 
-    public static void setTailRegex(String regex){
+    public static void setTailRegex(String regex) {
         try {
             ConfigManager cfg = ExfriendManager.getCurrent().getConfig();
             cfg.putString(ConfigItems.qn_chat_tail_regex_text, regex);
@@ -274,7 +278,7 @@ public class ChatTailHook extends BaseDelayableHook {
         }
     }
 
-    public static String getTailRegex(){
+    public static String getTailRegex() {
         // (?:(?![A-Za-z0-9])(?:[\x21-\x7e？！]))$
         return ExfriendManager.getCurrent().getConfig()
                 .getStringOrDefault(ConfigItems.qn_chat_tail_regex_text, "");
