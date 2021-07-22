@@ -1,6 +1,6 @@
 /* QNotified - An Xposed module for QQ/TIM
  * Copyright (C) 2019-2020 xenonhydride@gmail.com
- * https://github.com/cinit/QNotified
+ * https://github.com/ferredoxin/QNotified
  *
  * This software is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -167,9 +167,9 @@ public class SettingsActivity extends IphoneTitleBarActivityCompat implements Vi
         }
         ll.addView(subtitle(this, "消息通知设置(不影响接收消息)屏蔽后可能仍有[橙字],但通知栏不会有通知,赞说说不提醒仅屏蔽通知栏的通知"));
         ll.addView(subtitle(this, "    注:屏蔽后可能仍有[橙字],但不会有通知"));
-        ll.addView(_t = newListItemButton(this, "屏蔽指定群@全体成员通知", HtmlCompat.fromHtml("<font color='" + get_RGB(hiColor.getDefaultColor()) + "'>[@全体成员]</font>就这点破事",FROM_HTML_MODE_LEGACY), "%d个群", clickToProxyActAction(ACTION_MUTE_AT_ALL)));
+        ll.addView(_t = newListItemButton(this, "屏蔽指定群@全体成员通知", HtmlCompat.fromHtml("<font color='" + get_RGB(hiColor.getDefaultColor()) + "'>[@全体成员]</font>就这点破事", FROM_HTML_MODE_LEGACY), "%d个群", clickToProxyActAction(ACTION_MUTE_AT_ALL)));
         __tv_muted_atall = _t.findViewById(R_ID_VALUE);
-        ll.addView(_t = newListItemButton(this, "屏蔽指定群的红包通知", HtmlCompat.fromHtml("<font color='" + get_RGB(hiColor.getDefaultColor()) + "'>[QQ红包][有红包]</font>恭喜发财",FROM_HTML_MODE_LEGACY), "%d个群", clickToProxyActAction(ACTION_MUTE_RED_PACKET)));
+        ll.addView(_t = newListItemButton(this, "屏蔽指定群的红包通知", HtmlCompat.fromHtml("<font color='" + get_RGB(hiColor.getDefaultColor()) + "'>[QQ红包][有红包]</font>恭喜发财", FROM_HTML_MODE_LEGACY), "%d个群", clickToProxyActAction(ACTION_MUTE_RED_PACKET)));
         __tv_muted_redpacket = _t.findViewById(R_ID_VALUE);
         ll.addView(newListItemHookSwitchInit(this, "被赞说说不提醒", "不影响评论,转发或击掌的通知", MuteQZoneThumbsUp.get()));
         ll.addView(newListItemHookSwitchInit(this, "转发消息点头像查看详细信息", "仅限合并转发的消息", MultiForwardAvatarHook.get()));
@@ -205,8 +205,8 @@ public class SettingsActivity extends IphoneTitleBarActivityCompat implements Vi
         addViewConditionally(ll, this, "强制使用系统相册", "支持8.3.6及更高", ForceSystemAlbum.INSTANCE);
         addViewConditionally(ll, this, "强制使用系统文件", "支持8.3.6及更高", ForceSystemFile.INSTANCE);
         addViewConditionally(ll, newListItemButton(this, "修改侧滑边距", "感谢祈无，支持8.4.1及更高，重启后生效", "", clickToProxyActAction(ChangeDrawerWidthActivity.class)), ChangeDrawerWidth.INSTANCE.getCondition());
-        ll.addView(newListItemHookSwitchInit(this,"屏蔽QQ空间滑动相机",null, DisableQzoneSlideCamera.INSTANCE));
-        ll.addView(newListItemHookSwitchInit(this,"回执消息文本化",null, SimpleReceiptMessage.INSTANCE));
+        ll.addView(newListItemHookSwitchInit(this, "屏蔽QQ空间滑动相机", null, DisableQzoneSlideCamera.INSTANCE));
+        ll.addView(newListItemHookSwitchInit(this, "回执消息文本化", null, SimpleReceiptMessage.INSTANCE));
 
         ll.addView(subtitle(this, "好友列表"));
         ll.addView(newListItemButton(this, "打开资料卡", "打开指定用户的资料卡", null, new View.OnClickListener() {
@@ -288,7 +288,7 @@ public class SettingsActivity extends IphoneTitleBarActivityCompat implements Vi
         ll.addView(newListItemButton(this, "故障排查", null, null, clickToProxyActAction(ACTION_TROUBLESHOOT_ACTIVITY)));
         ll.addView(newListItemButton(this, "Shell.exec", "正常情况下无需使用此功能", null, clickTheComing()));
         ll.addView(newListItemButton(this, "捐赠", "请选择扶贫方式", null, clickToProxyActAction(ACTION_DONATE_ACTIVITY)));
-        ll.addView(newListItemButton(this, "Github", "获取源代码 Bug -> Issue (star)", "cinit/QNotified", clickToUrl("https://github.com/cinit/QNotified")));
+        ll.addView(newListItemButton(this, "Github", "获取源代码 Bug -> Issue (star)", "ferredoxin/QNotified", clickToUrl("https://github.com/ferredoxin/QNotified")));
         ll.addView(subtitle(this, "本软件为免费软件,请尊重个人劳动成果,严禁倒卖\nLife feeds on negative entropy."));
         //bounceScrollView.setFocusable(true);
         //bounceScrollView.setFocusableInTouchMode(true);
@@ -470,7 +470,7 @@ public class SettingsActivity extends IphoneTitleBarActivityCompat implements Vi
         int _5 = dip2px(SettingsActivity.this, 5);
         editText.setPadding(_5, _5, _5, _5);
         //editText.setBackgroundDrawable(new HighContrastBorder());
-        ViewCompat.setBackground(editText,new HighContrastBorder());
+        ViewCompat.setBackground(editText, new HighContrastBorder());
         LinearLayout linearLayout = new LinearLayout(ctx);
         linearLayout.addView(editText, newLinearLayoutParams(MATCH_PARENT, WRAP_CONTENT, _5 * 2));
         final AlertDialog alertDialog = (AlertDialog) dialog

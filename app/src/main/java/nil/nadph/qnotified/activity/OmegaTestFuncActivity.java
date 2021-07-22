@@ -1,6 +1,6 @@
 /* QNotified - An Xposed module for QQ/TIM
  * Copyright (C) 2019-2020 xenonhydride@gmail.com
- * https://github.com/cinit/QNotified
+ * https://github.com/ferredoxin/QNotified
  *
  * This software is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -86,7 +87,9 @@ public class OmegaTestFuncActivity extends IphoneTitleBarActivityCompat {
                 }
             }).start();
         } else {
-            ll.addView(subtitle(this, "Omega测试功能[本功能将会收集您使用本功能发送的消息内容与当前QQ号 请酌情开启]", Color.RED));
+            ll.addView(subtitle(this, "Omega功能[本功能将会收集您使用本功能发送的消息内容与当前QQ号 请酌情开启]", Color.RED));
+            ll.addView(subtitle(this, "该页面内容随时会有增减或不可用等情况,我们不会受理任何关于此页面问题的报告,请遵循QNotified与QQ用户协议"
+                    + "本模块将不会对你所作的任何行为负责,同时请注意您对Omega Project的使用方式,我们随时有可能因被滥用而下线该功能", Color.RED));
             ll.addView(newListItemHookSwitchInit(this, "复制卡片消息", "", CopyCardMsg.INSTANCE));
             ll.addView(newListItemHookSwitchInit(this, "发送卡片消息", "ArkAppMsg(json)+StructMsg(xml)", CardMsgHook.get()));
             ll.addView(subtitle(this, "卡片消息使用说明:先输入卡片代码(聊天界面),后长按发送按钮\n勿滥用此功能! 频繁使用此功能被举报可能封号"));
@@ -103,6 +106,7 @@ public class OmegaTestFuncActivity extends IphoneTitleBarActivityCompat {
 
         setContentBackgroundDrawable(ResUtils.skin_background);
         setTitle("Omega测试性功能");
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         return true;
     }
 
