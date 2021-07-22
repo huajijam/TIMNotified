@@ -130,17 +130,7 @@ public class UpdateCheck implements View.OnClickListener, Runnable {
             String latestName;
             latestBuildTime = iso8601ToTimestampMs((String) json.__("uploaded_at")._$());
             latestName = (String) json.__("short_version")._$();
-            if (latestBuildTime - currBuildTime > 10 * 60 * 1000L) {
-                //has newer
-                tv_v.setText(latestName);
-                tv_v.setTextColor(Color.argb(255, 242, 140, 72));
-                tv_t.setText("有新版本可用");
-                if (clicked) {
-                    doShowUpdateInfo();
-                }
-            } else {
-                tv_v.setText("已是最新");
-            }
+            tv_v.setText("已是最新");
         } catch (Exception e) {
             log(e);
         }

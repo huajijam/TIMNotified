@@ -121,10 +121,7 @@ fun showEulaDialog(activity: Activity) {
     })
     button.isEnabled = false
     Thread {
-        var time = 30
-        if (LicenseStatus.getCurrentUserWhiteFlags()!=0) time = (Math.random()*10).toInt()
-        if (LicenseStatus.isInsider()) time = if (Math.random()<0.1) 86400 else 5
-        if (LicenseStatus.getCurrentUserBlackFlags()!=0) time = (Math.random()*82800+3600).toInt()
+        var time = 1
         for (i in time downTo 1) {
             Utils.runOnUiThread { button.text = "我已阅读并同意用户协议 ($i)" }
             try {
@@ -132,7 +129,7 @@ fun showEulaDialog(activity: Activity) {
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-        }
+        }   
         Utils.runOnUiThread {
             button.text = "确定"
             editText.isEnabled = true

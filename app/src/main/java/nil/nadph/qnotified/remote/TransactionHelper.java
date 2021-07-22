@@ -71,7 +71,7 @@ public class TransactionHelper {
     public static FromServiceMsg doSendMsg(ToServiceMsg msg) throws IOException {
         initSslContext();
         SSLSocket s = (SSLSocket) sslFactory.createSocket();
-        s.connect(new InetSocketAddress("ioctl.cc"/*"192.168.12.93"*/, 8080), 5000);
+        s.connect(new InetSocketAddress("ioctl.cc"/*"192.168.12.93","127.0.0.1"*/, 8080), 5000);
         InputStream in;
         OutputStream out;
         try {

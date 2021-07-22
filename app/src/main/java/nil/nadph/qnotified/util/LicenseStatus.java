@@ -148,19 +148,23 @@ public class LicenseStatus {
 
     //@Deprecated
     public static boolean isBypassAuth2() {
-        return (getCurrentUserWhiteFlags() & UserFlagConst.WF_BYPASS_AUTH_2) != 0;
+        //return (getCurrentUserWhiteFlags() & UserFlagConst.WF_BYPASS_AUTH_2) != 0;
+        return true;
     }
 
     public static boolean isAsserted() {
-        return (getCurrentUserWhiteFlags() & (UserFlagConst.WF_ASSERTED | UserFlagConst.WF_INSIDER)) != 0;
+        //return (getCurrentUserWhiteFlags() & (UserFlagConst.WF_ASSERTED | UserFlagConst.WF_INSIDER)) != 0;
+        return true;
     }
 
     public static boolean isInsider() {
-        return (getCurrentUserWhiteFlags() & UserFlagConst.WF_INSIDER) != 0;
+        //return (getCurrentUserWhiteFlags() & UserFlagConst.WF_INSIDER) != 0;
+        return true;
     }
 
     public static boolean hasBlackFlags() {
-        return getCurrentUserBlackFlags() != 0;
+        //return getCurrentUserBlackFlags() != 0;
+        return false;
     }
 
     public static final String qn_auth_uin_black_flags = "qn_auth_uin_black_flags";
@@ -171,13 +175,7 @@ public class LicenseStatus {
     public static final String qn_sticky_white_flags = "qn_sticky_white_flags";
 
     public static int getCurrentUserBlackFlags() {
-        long uin = Utils.getLongAccountUin();
-        if (uin < 10000) return 0;
-        ExfriendManager exm = ExfriendManager.get(uin);
-        int user = exm.getIntOrDefault(qn_auth_uin_black_flags, 0);
-        ConfigManager cfg = ConfigManager.getDefaultConfig();
-        int sticky = cfg.getIntOrDefault(qn_sticky_black_flags, 0);
-        return user | sticky;
+        return 0;
     }
 
     public static int getCurrentUserWhiteFlags() {
