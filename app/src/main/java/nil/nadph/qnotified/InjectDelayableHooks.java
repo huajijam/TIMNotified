@@ -25,7 +25,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.core.view.ViewCompat;
-import nil.nadph.qnotified.hook.BaseDelayableHook;
+import nil.nadph.qnotified.hook.AbsDelayableHook;
 import nil.nadph.qnotified.hook.SettingEntryHook;
 import nil.nadph.qnotified.step.Step;
 import nil.nadph.qnotified.ui.ProportionDrawable;
@@ -41,7 +41,10 @@ import java.util.HashSet;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static nil.nadph.qnotified.util.Initiator.load;
-import static nil.nadph.qnotified.util.Utils.*;
+import static nil.nadph.qnotified.util.Utils.dip2px;
+import static nil.nadph.qnotified.util.Utils.iget_object_or_null;
+import static nil.nadph.qnotified.util.Utils.log;
+import static nil.nadph.qnotified.util.Utils.loge;
 
 public class InjectDelayableHooks {
 
@@ -55,8 +58,8 @@ public class InjectDelayableHooks {
             activity = (Activity) Utils.getFirstNSFByType(director, load("mqq/app/AppActivity"));
         final Activity ctx = activity;
         boolean needDeobf = false;
-        BaseDelayableHook[] hooks = BaseDelayableHook.queryDelayableHooks();
-        for (BaseDelayableHook h : hooks) {
+        AbsDelayableHook[] hooks = AbsDelayableHook.queryDelayableHooks();
+        for (AbsDelayableHook h : hooks) {
             if (h.isEnabled() && !h.checkPreconditions()) {
                 needDeobf = true;
                 break;
@@ -73,7 +76,7 @@ public class InjectDelayableHooks {
                 log(e);
             }
             final HashSet<Step> todos = new HashSet<>();
-            for (BaseDelayableHook h : hooks) {
+            for (AbsDelayableHook h : hooks) {
                 if (!h.isEnabled()) continue;
                 for (Step i : h.getPreconditions()) {
                     if (!i.isDone()) todos.add(i);
@@ -141,7 +144,7 @@ public class InjectDelayableHooks {
             }
         }
         if (LicenseStatus.hasUserAcceptEula()) {
-            for (BaseDelayableHook h : hooks) {
+            for (AbsDelayableHook h : hooks) {
                 try {
                     if (h.isEnabled() && h.isTargetProc()) {
                         if (h.checkPreconditions()) {
@@ -170,7 +173,7 @@ public class InjectDelayableHooks {
     }
 
     public static void doInitDelayableHooksMP() {
-        for (BaseDelayableHook h : BaseDelayableHook.queryDelayableHooks()) {
+        for (AbsDelayableHook h : AbsDelayableHook.queryDelayableHooks()) {
             try {
                 if (h.isEnabled() && h.isTargetProc() && h.checkPreconditions()) {
                     SyncUtils.requestInitHook(h.getId(), h.getEffectiveProc());
