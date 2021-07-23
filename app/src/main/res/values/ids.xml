@@ -14,5 +14,5 @@
     <item type="id" name="jefsRulesSaveButton"/>
     <item type="id" name="jefsRulesCancelButton"/>
     <item type="id" name="jefsRulesResetButton"/>
-
+	<item type="id" name="ketalRecallImageView"/>
 </resources>

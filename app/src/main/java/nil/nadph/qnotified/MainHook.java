@@ -1,6 +1,6 @@
 /* QNotified - An Xposed module for QQ/TIM
  * Copyright (C) 2019-2020 xenonhydride@gmail.com
- * https://github.com/cinit/QNotified
+ * https://github.com/ferredoxin/QNotified
  *
  * This software is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -32,17 +32,26 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.*;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.*;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import dalvik.system.BaseDexClassLoader;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
 import me.kyuubiran.hook.RemoveCameraButton;
+import me.singleneuron.qn_kernel.tlb.ConfigTable;
 import nil.nadph.qnotified.activity.SettingsActivity;
 import nil.nadph.qnotified.config.ConfigItems;
 import nil.nadph.qnotified.config.ConfigManager;
@@ -51,11 +60,6 @@ import nil.nadph.qnotified.hook.rikka.CustomSplash;
 import nil.nadph.qnotified.ui.ResUtils;
 import nil.nadph.qnotified.ui.___WindowIsTranslucent;
 import nil.nadph.qnotified.util.*;
-
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.lang.reflect.*;
-import java.util.List;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static nil.nadph.qnotified.util.ActProxyMgr.ACTION_RESERVED;
@@ -280,6 +284,7 @@ public class MainHook {
     }
 
     public void performHook(Context ctx, Object step) {
+        ConfigTable.INSTANCE.setTim(isTim(ctx));
         SyncUtils.initBroadcast(ctx);
 //        if (SyncUtils.getProcessType() == SyncUtils.PROC_MSF) {
 //            Debug.waitForDebugger();
@@ -995,28 +1000,42 @@ public class MainHook {
 
         @Override
         public void callActivityOnCreate(Activity activity, Bundle icicle) {
-            if (icicle != null) {
-                String className = activity.getClass().getName();
-                if (className.startsWith("me.zpp0196.qqpurify.activity.")
-                        || className.startsWith("me.singleneuron.")) {
-                    icicle.setClassLoader(MainHook.class.getClassLoader());
+            try {
+                if (icicle != null) {
+                    String className = activity.getClass().getName();
+                    if (className.startsWith("me.zpp0196.qqpurify.activity.")
+                            || className.startsWith("me.singleneuron.")) {
+                        icicle.setClassLoader(MainHook.class.getClassLoader());
+                    }
                 }
+                injectModuleResources(activity.getResources());
+                mBase.callActivityOnCreate(activity, icicle);
+            } catch (Exception e) {
+                if (Pattern.matches("[\\W]me\\.|nil\\.nadph", Log.getStackTraceString(e).replace("nil.nadph.qnotified.MainHook$MyInstrumentation.callActivityOnStart",""))) {
+                    throw e;
+                }
+                //else ignore
             }
-            injectModuleResources(activity.getResources());
-            mBase.callActivityOnCreate(activity, icicle);
         }
 
         @Override
         public void callActivityOnCreate(Activity activity, Bundle icicle, PersistableBundle persistentState) {
-            if (icicle != null) {
-                String className = activity.getClass().getName();
-                if (className.startsWith("me.zpp0196.qqpurify.activity.")
-                        || className.startsWith("me.singleneuron.")) {
-                    icicle.setClassLoader(MainHook.class.getClassLoader());
+            try {
+                if (icicle != null) {
+                    String className = activity.getClass().getName();
+                    if (className.startsWith("me.zpp0196.qqpurify.activity.")
+                            || className.startsWith("me.singleneuron.")) {
+                        icicle.setClassLoader(MainHook.class.getClassLoader());
+                    }
                 }
+                injectModuleResources(activity.getResources());
+                mBase.callActivityOnCreate(activity, icicle, persistentState);
+            } catch (Exception e) {
+                if (Pattern.matches("[\\W]me\\.|nil\\.nadph", Log.getStackTraceString(e).replace("nil.nadph.qnotified.MainHook$MyInstrumentation.callActivityOnStart",""))) {
+                    throw e;
+                }
+                //else ignore
             }
-            injectModuleResources(activity.getResources());
-            mBase.callActivityOnCreate(activity, icicle, persistentState);
         }
 
         @Override

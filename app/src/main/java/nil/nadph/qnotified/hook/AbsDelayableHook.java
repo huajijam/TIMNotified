@@ -20,6 +20,7 @@ package nil.nadph.qnotified.hook;
 
 import androidx.annotation.NonNull;
 
+import me.ketal.hook.*;
 import me.kyuubiran.hook.*;
 import me.kyuubiran.hook.testhook.*;
 import me.nextalone.hook.EnableQLog;
@@ -116,6 +117,7 @@ public abstract class AbsDelayableHook implements SwitchConfigItem {
                     SimpleCheckIn.INSTANCE,
                     StartActivityHook.INSTANCE,
                     EnableQLog.INSTANCE,
+                    MultiActionHook.INSTANCE,
             };
         }
         return sAllHooks;

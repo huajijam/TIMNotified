@@ -77,13 +77,15 @@ public class DexKit {
     public static final int C_TogetherControlHelper = 25;
     //unknown class name
     public static final int C_GroupAppActivity = 26;
+    public static final int C_MultiMsg_Manager = 27;
     //the last index
-    public static final int DEOBF_NUM_C = 26;
+    public static final int DEOBF_NUM_C = 27;
 
     public static final int N_BASE_CHAT_PIE__INIT = 20001;
     public static final int N_BASE_CHAT_PIE__handleNightMask = 20002;
     public static final int N_BASE_CHAT_PIE__updateSession = 20003;
-    public static final int DEOBF_NUM_N = 3;
+    public static final int N_BASE_CHAT_PIE__createMulti = 20004;
+    public static final int DEOBF_NUM_N = 4;
 
 
     @Nullable
@@ -273,12 +275,16 @@ public class DexKit {
                 return "TogetherControlHelper";
             case C_GroupAppActivity:
                 return "GroupAppActivity";
+            case C_MultiMsg_Manager:
+                return "multimsg_manager";  
             case N_BASE_CHAT_PIE__INIT:
                 return "base_chat_pie__init";
             case N_BASE_CHAT_PIE__handleNightMask:
                 return "base_chat_pie__handleNightMask";
             case N_BASE_CHAT_PIE__updateSession:
                 return "base_chat_pie__updateSession";
+            case N_BASE_CHAT_PIE__createMulti:
+                return "base_chat_pie__createMulti";
         }
         throw new IndexOutOfBoundsException("No class index for " + i + ",max = " + DEOBF_NUM_C);
     }
@@ -364,9 +370,13 @@ public class DexKit {
                 //unknown
                 ret = "com.tencent.mobileqq.IntimateRelationship";
                 break;
+            case C_MultiMsg_Manager:
+                ret = "com/tencent/mobileqq/multimsg/MultiMsgManager";
+                break;
             case N_BASE_CHAT_PIE__INIT:
             case N_BASE_CHAT_PIE__handleNightMask:
             case N_BASE_CHAT_PIE__updateSession:
+            case N_BASE_CHAT_PIE__createMulti:
                 ret = _BaseChatPie().getName();
                 break;
             default:
@@ -440,8 +450,12 @@ public class DexKit {
                 return new byte[][]{new byte[]{0x2D, 0x23, 0x68, 0x61, 0x6E, 0x64, 0x6C, 0x65, 0x4E, 0x69, 0x67, 0x68, 0x74, 0x4D, 0x61, 0x73, 0x6B, 0x23, 0x20, 0x3A, 0x20, 0x69, 0x6E, 0x4E, 0x69, 0x67, 0x68, 0x74, 0x4D, 0x6F, 0x64, 0x65}};
             case N_BASE_CHAT_PIE__updateSession:
                 return new byte[][]{new byte[]{0x19, 0x41, 0x49, 0x4F, 0x54, 0x69, 0x6D, 0x65, 0x20, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x65, 0x6E, 0x64}};
+            case N_BASE_CHAT_PIE__createMulti:
+                return new byte[][]{new byte[]{0x0B, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x4D, 0x75, 0x6C, 0x74, 0x69}};
             case C_CustomWidgetUtil:
                 return new byte[][]{new byte[]{0x03, 0x4E, 0x45, 0x57, 0x00}};
+            case C_MultiMsg_Manager:
+                return new byte[][]{new byte[]{0x1C, 0x5B, 0x73, 0x65, 0x6E, 0x64, 0x4D, 0x75, 0x6C, 0x74, 0x69, 0x4D, 0x73, 0x67, 0x5D, 0x64, 0x61, 0x74, 0x61, 0x2E, 0x6C, 0x65, 0x6E, 0x67, 0x74, 0x68, 0x20, 0x3D, 0x20}};
 
         }
         throw new IndexOutOfBoundsException("No class index for " + i + ",max = " + DEOBF_NUM_C);
@@ -497,10 +511,14 @@ public class DexKit {
                 return new int[]{2, 11, 6};
             case C_GroupAppActivity:
                 return new int[]{2, 11, 6};
+            case C_MultiMsg_Manager:
+                return new int[]{9, 4, 3, 7};
             case N_BASE_CHAT_PIE__INIT:
             case N_BASE_CHAT_PIE__handleNightMask:
             case N_BASE_CHAT_PIE__updateSession:
                 return new int[]{7, 6, 3};
+            case N_BASE_CHAT_PIE__createMulti:
+                return new int[]{6, 2, 7, 3};
             case C_CustomWidgetUtil:
                 return new int[]{5, 4, 9};
         }
@@ -646,6 +664,13 @@ public class DexKit {
                         return m;
                 }
                 break;
+            case N_BASE_CHAT_PIE__createMulti:
+                for (DexMethodDescriptor m : __methods) {
+                    String name = m.declaringClass.replace('/', '.');
+                    if (name.contains("com.tencent.mobileqq.activity.aio.helper.AIOMultiActionHelper") || name.contains(_BaseChatPie().getName()))
+                        return m;
+                }
+                break;
             case C_CustomWidgetUtil:
                 a:
                 for (DexMethodDescriptor m : __methods) {
@@ -685,6 +710,7 @@ public class DexKit {
                 }
                 break;
             case C_GroupAppActivity:
+            case C_MultiMsg_Manager:
                 for (DexMethodDescriptor m : __methods) {
                     Class clz = Initiator.load(m.declaringClass);
                     if (clz.isEnum()) continue;
