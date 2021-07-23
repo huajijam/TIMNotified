@@ -118,6 +118,7 @@ public abstract class AbsDelayableHook implements SwitchConfigItem {
                     StartActivityHook.INSTANCE,
                     EnableQLog.INSTANCE,
                     MultiActionHook.INSTANCE,
+                    AutoRenewFire.INSTANCE,
             };
         }
         return sAllHooks;

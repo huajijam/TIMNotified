@@ -24,7 +24,7 @@
                 android:textSize="16sp"/>
         <EditText
                 android:id="@+id/auto_renew_fire_keyword_et"
-                android:hint="续火消息内容(仅文本 4个字以内)"
+                android:hint="续火消息内容"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:inputType="textMultiLine"/>
